@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{baseUrl}}/admin/reports/occupancy?hotelId={{hotelId}}&from=2026-10-01&to=2026-10-31"
+method: GET
+headers:
+  Authorization: Bearer {{adminToken}}
+queryParams:
+  hotelId: "{{hotelId}}"
+  from: 2026-10-01
+  to: 2026-10-31
+order: 1000

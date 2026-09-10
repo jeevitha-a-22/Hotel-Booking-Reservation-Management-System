@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/pricing-rules?roomTypeId={{roomTypeId}}"
+method: GET
+queryParams:
+  roomTypeId: "{{roomTypeId}}"
+order: 3000

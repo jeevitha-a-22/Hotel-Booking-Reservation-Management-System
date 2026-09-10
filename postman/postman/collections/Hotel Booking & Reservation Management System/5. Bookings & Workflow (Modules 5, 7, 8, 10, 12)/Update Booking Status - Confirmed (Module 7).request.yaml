@@ -1,0 +1,14 @@
+$kind: http-request
+name: Update Booking Status -> Confirmed (Module 7)
+url: "{{baseUrl}}/bookings/{{bookingId}}/status"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{staffToken}}
+body:
+  type: text
+  content: |-
+    {
+      "status": "Confirmed"
+    }
+order: 5000

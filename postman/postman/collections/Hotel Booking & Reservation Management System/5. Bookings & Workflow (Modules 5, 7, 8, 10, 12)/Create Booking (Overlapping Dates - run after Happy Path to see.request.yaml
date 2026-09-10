@@ -1,0 +1,17 @@
+$kind: http-request
+name: Create Booking (Overlapping Dates - run after Happy Path to see 409 once rooms exhausted)
+url: "{{baseUrl}}/bookings"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "roomTypeId": "{{roomTypeId}}",
+      "checkIn": "2026-10-11",
+      "checkOut": "2026-10-12",
+      "occupancy": 1
+    }
+order: 3000

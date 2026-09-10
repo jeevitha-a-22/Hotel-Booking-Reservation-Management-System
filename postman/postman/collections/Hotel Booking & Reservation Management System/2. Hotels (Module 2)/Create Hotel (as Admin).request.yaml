@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/hotels"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{adminToken}}
+body:
+  type: text
+  content: |-
+    {
+      "name": "Grand Bengaluru Palace",
+      "city": "Bengaluru",
+      "address": "MG Road",
+      "amenities": ["Pool", "WiFi", "Gym"],
+      "rating": 4.5
+    }
+order: 1000

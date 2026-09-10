@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/pricing-rules"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{adminToken}}
+body:
+  type: text
+  content: |-
+    {
+      "roomTypeId": "{{roomTypeId}}",
+      "season": "Diwali",
+      "startDate": "2026-11-01",
+      "endDate": "2026-11-07",
+      "multiplier": 1.5
+    }
+order: 2000

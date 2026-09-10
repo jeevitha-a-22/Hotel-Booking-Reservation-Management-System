@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/bookings"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "roomTypeId": "{{roomTypeId}}",
+      "checkIn": "2026-10-10",
+      "checkOut": "2026-10-13",
+      "occupancy": 2,
+      "addOns": [{ "name": "Breakfast", "amount": 500 }]
+    }
+order: 1000

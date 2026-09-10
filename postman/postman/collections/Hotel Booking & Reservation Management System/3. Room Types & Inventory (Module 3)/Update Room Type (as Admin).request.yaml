@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/roomtypes/{{roomTypeId}}"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{adminToken}}
+body:
+  type: text
+  content: |-
+    {
+      "basePrice": 3800
+    }
+order: 5000

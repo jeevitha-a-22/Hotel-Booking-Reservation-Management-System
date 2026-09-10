@@ -1,0 +1,18 @@
+$kind: http-request
+name: Create Room Type (Business-Rule Conflict - duplicate/invalid hotel)
+url: "{{baseUrl}}/roomtypes"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{adminToken}}
+body:
+  type: text
+  content: |-
+    {
+      "hotelId": "000000000000000000000000",
+      "name": "Ghost Room",
+      "basePrice": 100,
+      "totalRooms": 1,
+      "capacity": 1
+    }
+order: 2000

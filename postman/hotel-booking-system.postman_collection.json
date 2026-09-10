@@ -1,0 +1,469 @@
+{
+  "info": {
+    "name": "Hotel Booking & Reservation Management System",
+    "description": "CIA-3 Project - Christ University 5th Semester. Covers all 13 modules: auth, hotels, room types/rooms, availability search, bookings, pricing rules, guest history, invoices, and admin reports.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "staffToken", "value": "" },
+    { "key": "hotelId", "value": "" },
+    { "key": "roomTypeId", "value": "" },
+    { "key": "roomId", "value": "" },
+    { "key": "bookingId", "value": "" },
+    { "key": "guestId", "value": "" }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-capture tokens/ids returned by common endpoints so later requests just work.",
+          "try {",
+          "  const json = pm.response.json();",
+          "  if (json && json.data && json.data.token) {",
+          "    pm.collectionVariables.set('token', json.data.token);",
+          "    if (json.data.role === 'admin') pm.collectionVariables.set('adminToken', json.data.token);",
+          "    if (json.data.role === 'staff') pm.collectionVariables.set('staffToken', json.data.token);",
+          "    if (json.data._id) pm.collectionVariables.set('guestId', json.data._id);",
+          "  }",
+          "  if (json && json.data && json.data._id) {",
+          "    const url = pm.request.url.toString();",
+          "    if (url.includes('/hotels') && pm.request.method === 'POST') pm.collectionVariables.set('hotelId', json.data._id);",
+          "    if (url.includes('/roomtypes') && pm.request.method === 'POST') pm.collectionVariables.set('roomTypeId', json.data._id);",
+          "    if (url.includes('/bookings') && pm.request.method === 'POST') pm.collectionVariables.set('bookingId', json.data._id);",
+          "  }",
+          "} catch (e) { /* non-JSON or no data field - ignore */ }"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Auth (Module 1)",
+      "item": [
+        {
+          "name": "Register Guest (Happy Path)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Asha Rao\",\n  \"email\": \"asha.rao@example.com\",\n  \"password\": \"Guest@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register (Validation Failure - missing email)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"No Email User\",\n  \"password\": \"Guest@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Guest",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"asha.rao@example.com\",\n  \"password\": \"Guest@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Admin (seeded)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@hotel.com\",\n  \"password\": \"Admin@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Staff (seeded)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"staff@hotel.com\",\n  \"password\": \"Staff@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        },
+        {
+          "name": "Get My Profile (Authentication Failure - no token)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Hotels (Module 2)",
+      "item": [
+        {
+          "name": "Create Hotel (as Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/hotels",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Grand Bengaluru Palace\",\n  \"city\": \"Bengaluru\",\n  \"address\": \"MG Road\",\n  \"amenities\": [\"Pool\", \"WiFi\", \"Gym\"],\n  \"rating\": 4.5\n}"
+            }
+          }
+        },
+        {
+          "name": "List Hotels",
+          "request": { "method": "GET", "url": "{{baseUrl}}/hotels?city=Bengaluru" }
+        },
+        {
+          "name": "Get Hotel by ID",
+          "request": { "method": "GET", "url": "{{baseUrl}}/hotels/{{hotelId}}" }
+        },
+        {
+          "name": "Get Hotel (Not Found - invalid ID)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/hotels/000000000000000000000000" }
+        },
+        {
+          "name": "Update Hotel (as Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/hotels/{{hotelId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"rating\": 4.7\n}" }
+          }
+        },
+        {
+          "name": "Update Hotel (Authorization Failure - guest token)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/hotels/{{hotelId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"rating\": 1\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Room Types & Inventory (Module 3)",
+      "item": [
+        {
+          "name": "Create Room Type (as Admin, auto-generates Rooms)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/roomtypes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hotelId\": \"{{hotelId}}\",\n  \"name\": \"Deluxe\",\n  \"basePrice\": 3500,\n  \"totalRooms\": 5,\n  \"capacity\": 3,\n  \"amenities\": [\"AC\", \"TV\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Room Type (Business-Rule Conflict - duplicate/invalid hotel)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/roomtypes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hotelId\": \"000000000000000000000000\",\n  \"name\": \"Ghost Room\",\n  \"basePrice\": 100,\n  \"totalRooms\": 1,\n  \"capacity\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "List Room Types by Hotel",
+          "request": { "method": "GET", "url": "{{baseUrl}}/roomtypes?hotelId={{hotelId}}" }
+        },
+        {
+          "name": "Get Rooms of a Room Type",
+          "request": { "method": "GET", "url": "{{baseUrl}}/roomtypes/{{roomTypeId}}/rooms" }
+        },
+        {
+          "name": "Update Room Type (as Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/roomtypes/{{roomTypeId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"basePrice\": 3800\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Availability Search (Module 4)",
+      "item": [
+        {
+          "name": "Search Available Rooms",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/hotels/search?city=Bengaluru&checkIn=2026-10-10&checkOut=2026-10-13&occupancy=2"
+          }
+        },
+        {
+          "name": "Search (Validation Failure - bad date range)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/hotels/search?city=Bengaluru&checkIn=2026-10-13&checkOut=2026-10-10"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Bookings & Workflow (Modules 5, 7, 8, 10, 12)",
+      "item": [
+        {
+          "name": "Create Booking (Happy Path)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomTypeId\": \"{{roomTypeId}}\",\n  \"checkIn\": \"2026-10-10\",\n  \"checkOut\": \"2026-10-13\",\n  \"occupancy\": 2,\n  \"addOns\": [{ \"name\": \"Breakfast\", \"amount\": 500 }]\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Booking (No Token - Authentication Failure)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomTypeId\": \"{{roomTypeId}}\",\n  \"checkIn\": \"2026-10-10\",\n  \"checkOut\": \"2026-10-13\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Booking (Overlapping Dates - run after Happy Path to see 409 once rooms exhausted)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomTypeId\": \"{{roomTypeId}}\",\n  \"checkIn\": \"2026-10-11\",\n  \"checkOut\": \"2026-10-12\",\n  \"occupancy\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Booking by ID",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/bookings/{{bookingId}}"
+          }
+        },
+        {
+          "name": "Update Booking Status -> Confirmed (Module 7)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{staffToken}}" }
+            ],
+            "url": "{{baseUrl}}/bookings/{{bookingId}}/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Confirmed\"\n}" }
+          }
+        },
+        {
+          "name": "Update Booking Status (Invalid Transition -> CheckedOut directly)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{staffToken}}" }
+            ],
+            "url": "{{baseUrl}}/bookings/{{bookingId}}/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"CheckedOut\"\n}" }
+          }
+        },
+        {
+          "name": "Check-in Booking (Module 8)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{staffToken}}" }],
+            "url": "{{baseUrl}}/bookings/{{bookingId}}/checkin"
+          }
+        },
+        {
+          "name": "Check-out Booking (Module 8)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{staffToken}}" }],
+            "url": "{{baseUrl}}/bookings/{{bookingId}}/checkout"
+          }
+        },
+        {
+          "name": "Cancel Booking (Module 10)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/bookings/{{bookingId}}/cancel"
+          }
+        },
+        {
+          "name": "Get Invoice (Module 12)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/bookings/{{bookingId}}/invoice"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Dynamic Pricing Rules (Module 6)",
+      "item": [
+        {
+          "name": "Create Pricing Rule (Weekend x1.2)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/pricing-rules",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomTypeId\": \"{{roomTypeId}}\",\n  \"season\": \"Weekend\",\n  \"dayOfWeek\": [0, 6],\n  \"multiplier\": 1.2\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Pricing Rule (Diwali Season x1.5)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/pricing-rules",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomTypeId\": \"{{roomTypeId}}\",\n  \"season\": \"Diwali\",\n  \"startDate\": \"2026-11-01\",\n  \"endDate\": \"2026-11-07\",\n  \"multiplier\": 1.5\n}"
+            }
+          }
+        },
+        {
+          "name": "List Pricing Rules for Room Type",
+          "request": { "method": "GET", "url": "{{baseUrl}}/pricing-rules?roomTypeId={{roomTypeId}}" }
+        }
+      ]
+    },
+    {
+      "name": "7. Housekeeping (Module 9)",
+      "item": [
+        {
+          "name": "Update Housekeeping Status (as Staff)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{staffToken}}" }
+            ],
+            "url": "{{baseUrl}}/rooms/{{roomId}}/housekeeping",
+            "body": { "mode": "raw", "raw": "{\n  \"housekeepingStatus\": \"Inspected\"\n}" }
+          }
+        },
+        {
+          "name": "Update Housekeeping Status (Authorization Failure - guest token)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/rooms/{{roomId}}/housekeeping",
+            "body": { "mode": "raw", "raw": "{\n  \"housekeepingStatus\": \"Clean\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Guest Booking History (Module 11)",
+      "item": [
+        {
+          "name": "Get Guest Booking History",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/guests/{{guestId}}/bookings"
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Admin Reports (Module 13)",
+      "item": [
+        {
+          "name": "Get Occupancy Report",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/reports/occupancy?hotelId={{hotelId}}&from=2026-10-01&to=2026-10-31"
+          }
+        },
+        {
+          "name": "Get Occupancy Report (Authorization Failure - guest token)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/admin/reports/occupancy?hotelId={{hotelId}}"
+          }
+        }
+      ]
+    }
+  ]
+}

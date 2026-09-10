@@ -1,0 +1,32 @@
+$kind: collection
+description: "CIA-3 Project - Christ University 5th Semester. Covers all 13 modules: auth, hotels, room types/rooms, availability search, bookings, pricing rules, guest history, invoices, and admin reports."
+variables:
+  baseUrl: http://localhost:5000/api
+  token: ""
+  adminToken: ""
+  staffToken: ""
+  hotelId: ""
+  roomTypeId: ""
+  roomId: ""
+  bookingId: ""
+  guestId: ""
+scripts:
+  - type: http:afterResponse
+    code: |-
+      // Auto-capture tokens/ids returned by common endpoints so later requests just work.
+      try {
+        const json = pm.response.json();
+        if (json && json.data && json.data.token) {
+          pm.collectionVariables.set('token', json.data.token);
+          if (json.data.role === 'admin') pm.collectionVariables.set('adminToken', json.data.token);
+          if (json.data.role === 'staff') pm.collectionVariables.set('staffToken', json.data.token);
+          if (json.data._id) pm.collectionVariables.set('guestId', json.data._id);
+        }
+        if (json && json.data && json.data._id) {
+          const url = pm.request.url.toString();
+          if (url.includes('/hotels') && pm.request.method === 'POST') pm.collectionVariables.set('hotelId', json.data._id);
+          if (url.includes('/roomtypes') && pm.request.method === 'POST') pm.collectionVariables.set('roomTypeId', json.data._id);
+          if (url.includes('/bookings') && pm.request.method === 'POST') pm.collectionVariables.set('bookingId', json.data._id);
+        }
+      } catch (e) { /* non-JSON or no data field - ignore */ }
+    language: text/javascript

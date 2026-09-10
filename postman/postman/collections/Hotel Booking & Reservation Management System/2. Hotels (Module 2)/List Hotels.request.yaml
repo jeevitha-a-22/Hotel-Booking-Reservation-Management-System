@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/hotels?city=Bengaluru"
+method: GET
+queryParams:
+  city: Bengaluru
+order: 2000

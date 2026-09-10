@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/roomtypes?hotelId={{hotelId}}"
+method: GET
+queryParams:
+  hotelId: "{{hotelId}}"
+order: 3000

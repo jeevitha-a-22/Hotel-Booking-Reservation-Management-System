@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/bookings"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "roomTypeId": "{{roomTypeId}}",
+      "checkIn": "2026-10-10",
+      "checkOut": "2026-10-13"
+    }
+order: 2000
