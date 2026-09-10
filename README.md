@@ -9,7 +9,7 @@
 | S.No | Name | Register No. | Department | Section |
 |---:|---|---:|---|:---:|
 | 1 | Jeevitha A | 2462079 | ADSE | 5BTCSAIML B |
-| 2 | Gopireddy Rethvik Reddy | 2462076 | ADSE | 5BTCSAIML B |
+| 2 | G.Rethvik Reddy | 2462076 | ADSE | 5BTCSAIML B |
 | 3 | Florentina Francis | 2462070 | ADSE | 5BTCSAIML B |
 | 4 | Girikshith | 2462073 | ADSE | 5BTCSAIML B |
 
