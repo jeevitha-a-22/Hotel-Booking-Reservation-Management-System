@@ -21,7 +21,7 @@
 |---|---:|---|
 | **Jeevitha A** | 2462079 | Authentication, User Management and Role-Based Access Control |
 | **Gopireddy Rethvik Reddy** | 2462076 | Hotel Management, Room Type Management and Room Inventory |
-| **Florentina Francis** | 2562070 | Booking Workflow, Availability Search, Check-In and Check-Out |
+| **Florentina Francis** | 2462070 | Booking Workflow, Availability Search, Check-In and Check-Out |
 | **Girikshith** | 2462073 | Dynamic Pricing, Housekeeping, Guest History, Invoice, Admin Reports, Postman Testing and Documentation |
 
 ---
